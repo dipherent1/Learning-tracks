@@ -4,6 +4,12 @@ import GitHubProvider from "next-auth/providers/github"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 
+
+console.log("--- SERVER-SIDE AUTHENTICATION ---");
+console.log("GITHUB_ID:", process.env.GITHUB_ID);
+console.log("GITHUB_SECRET:", process.env.GITHUB_SECRET);
+console.log("---------------------------------");
+
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
