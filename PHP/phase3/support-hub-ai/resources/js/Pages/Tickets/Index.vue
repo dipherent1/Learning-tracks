@@ -1,6 +1,8 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { defineProps } from 'vue';
+import { Link } from '@inertiajs/vue3'; // <-- Add this import
+
 
 // The controller is passing a 'tickets' prop, so we need to define it
 const props = defineProps({
@@ -14,7 +16,12 @@ const props = defineProps({
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Support Tickets
             </h2>
+            <Link :href="route('tickets.create')" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                Create Ticket
+            </Link>
+
         </template>
+        
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

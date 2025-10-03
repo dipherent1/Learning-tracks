@@ -23,5 +23,8 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    // Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::resource('/tickets', TicketController::class)->only([
+        'index','create','store'
+    ]);
 });
