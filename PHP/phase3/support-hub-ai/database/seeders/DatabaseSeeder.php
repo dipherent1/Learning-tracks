@@ -16,8 +16,16 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->withPersonalTeam()->create();
 
         User::factory()->withPersonalTeam()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'admin',
+            'email' => 'admin@example.com',
+            'password' => 'adminpass'
+        ]);
+
+        $user = User::factory(10)->create();
+        $this->call([
+            DepartmentSeeder::class,
+            TicketSeeder::class
+
         ]);
     }
 }

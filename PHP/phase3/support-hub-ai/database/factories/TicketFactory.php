@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Department;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +19,14 @@ class TicketFactory extends Factory
     public function definition(): array
     {
         return [
+
+            'user_id' => User::factory(),
+            'department_id' => Department::factory(),
+            'title' => fake()->sentence(),
+            'content' => fake()->paragraph(3),
+            'status' => fake()->randomElement(['open', 'in_progress', 'closed']),
+            'priority' => fake()->randomElement(['low', 'medium', 'high']),
+            'category' => fake()->randomElement(['billing', 'technical'])
             //
         ];
     }
