@@ -37,5 +37,14 @@ class TicketController extends Controller
 
         return to_route('tickets.index');
     }
+
+    public function show(Ticket $ticket)
+    {
+        $ticket->load(['user','department','replies.user']);
+
+        return Inertia::render('Tickets/Show', [
+            'ticket' => $ticket
+        ]);
+    }
     //
 }
