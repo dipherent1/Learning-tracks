@@ -1,10 +1,24 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { defineProps } from 'vue';
+import { useForm } from '@inertiajs/vue3'; // <-- 1. Import useForm
 
 const props = defineProps({
     ticket: Object,
 });
+
+// 2. Create a form helper for the reply form
+const form = useForm({
+    content: '',
+});
+
+// 3. Create the submit function
+const submitReply = () => {
+    form.post(route('tickets.replies.store', props.ticket.id), {
+        preserveScroll: true, // Keep the user's scroll position
+        onSuccess: () => form.reset(), // Clear the textarea on success
+    });
+};
 </script>
 
 <template>
@@ -59,18 +73,26 @@ const props = defineProps({
 
                 <!-- Reply Form (we will make this functional later) -->
                 <div class="mt-8 bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                     <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
-                        Add a Reply
-                    </h3>
-                    <form>
-                        <textarea rows="5" class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Type your reply..."></textarea>
-                        <div class="flex justify-end mt-4">
-                             <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-md">
-                                Submit Reply
-                            </button>
-                        </div>
-                    </form>
+             <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
+                Add a Reply
+            </h3>
+            <!-- 4. Hook up the form -->
+            <form @submit.prevent="submitReply">
+                <textarea 
+                    v-model="form.content"
+                    rows="5" 
+                    class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" 
+                    placeholder="Type your reply..."
+                ></textarea>
+                <div v-if="form.errors.content" class="text-sm text-red-600 mt-1">{{ form.errors.content }}</div>
+                
+                <div class="flex justify-end mt-4">
+                     <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                        Submit Reply
+                    </button>
                 </div>
+            </form>
+        </div>
 
             </div>
         </div>
