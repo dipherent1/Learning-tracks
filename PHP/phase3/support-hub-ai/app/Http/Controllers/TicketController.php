@@ -7,14 +7,26 @@ use App\Models\Department;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TicketController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
-        $tickets = Ticket::with('user', 'department')
-        ->latest()
-        ->paginate(10);
+
+        $user = Auth::user();
+
+
+        $ticketsQuery = Ticket::with('user', 'department')
+        ->latest();
+        
+        if (! $user->isAdmin()){
+            $ticketsQuery->where('user_id',$user->id);
+        }
+
+
+        $tickets = $ticketsQuery->paginate(10);
 
         return Inertia::render('Tickets/Index',[
             'tickets' => $tickets
@@ -40,6 +52,8 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
+        $this->authorize('view',$ticket);
+
         $ticket->load(['user','department','replies.user']);
 
         return Inertia::render('Tickets/Show', [
