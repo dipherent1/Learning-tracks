@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Department;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +60,14 @@ class TicketController extends Controller
         return Inertia::render('Tickets/Show', [
             'ticket' => $ticket
         ]);
+    }
+
+    public function update(UpdateTicketRequest $request,Ticket $ticket)
+    {
+        $this->authorize('update', $ticket);
+        $ticket->update($request->validated());
+
+        return to_route('tickets.show', $ticket);
     }
     //
 }

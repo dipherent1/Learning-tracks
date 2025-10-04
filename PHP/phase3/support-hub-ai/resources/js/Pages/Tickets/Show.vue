@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { defineProps } from 'vue';
-import { useForm } from '@inertiajs/vue3'; // <-- 1. Import useForm
+import { useForm, usePage } from '@inertiajs/vue3'; // <-- 1. Import useForm
 
 const props = defineProps({
     ticket: Object,
@@ -11,6 +11,17 @@ const props = defineProps({
 const form = useForm({
     content: '',
 });
+
+const users = usePage().props.users;
+const updateForm = useForm({
+    status: props.ticket.status,
+    agent_id: props.ticket.agent_id,
+});
+
+const submitUpdate = () => {
+    updateForm.put(route('tickets.update', props.ticket.id));
+};
+
 
 // 3. Create the submit function
 const submitReply = () => {
@@ -72,7 +83,7 @@ const submitReply = () => {
                 </div>
 
                 <!-- Reply Form (we will make this functional later) -->
-                <div class="mt-8 bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+        <div class="mt-8 bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
              <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
                 Add a Reply
             </h3>
@@ -93,6 +104,34 @@ const submitReply = () => {
                 </div>
             </form>
         </div>
+         <form @submit.prevent="submitUpdate">
+                            <!-- Status -->
+                            <div>
+                                <label for="status">Status</label>
+                                <select id="status" v-model="updateForm.status" class="block w-full mt-1">
+                                    <option value="open">Open</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Assign Agent -->
+                            <div class="mt-4">
+                                <label for="agent">Assign Agent</label>
+                                <select id="agent" v-model="updateForm.agent_id" class="block w-full mt-1">
+                                    <option :value="null">Unassigned</option>
+                                    <option v-for="user in users" :key="user.id" :value="user.id">
+                                        {{ user.name }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="flex justify-end mt-4">
+                                <button type="submit" :disabled="updateForm.processing" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                                    Update
+                                </button>
+                            </div>
+                        </form>
 
             </div>
         </div>

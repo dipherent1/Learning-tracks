@@ -27,7 +27,7 @@ class TicketPolicy
 
 
         return $user->id == $ticket->user_id;
-        
+
         }
 
     /**
@@ -43,6 +43,9 @@ class TicketPolicy
      */
     public function update(User $user, Ticket $ticket): bool
     {
+        if ($user->isAdmin()){
+            return true;
+        }
         return false;
     }
 

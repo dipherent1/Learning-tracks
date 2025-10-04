@@ -26,7 +26,7 @@ Route::middleware([
 
     // Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
     Route::resource('/tickets', TicketController::class)->only([
-        'index','create','store','show'
+        'index','create','store','show', 'update'
     ]);
 
     Route::post('/tickets/{ticket}/replies',[ReplyController::class, 'store'])->name('tickets.replies.store');
