@@ -12,7 +12,7 @@ class UpdateTicketRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class UpdateTicketRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in(['open', 'in_progress', 'closed'])],
-            'agent_id' => ['nullable', 'exists:user,id']
+            'agent_id' => ['nullable', 'exists:users,id']
             //
         ];
     }

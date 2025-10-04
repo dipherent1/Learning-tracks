@@ -57,8 +57,13 @@ class TicketController extends Controller
 
         $ticket->load(['user','department','replies.user']);
 
+        $user = auth()->user();
+
         return Inertia::render('Tickets/Show', [
-            'ticket' => $ticket
+            'ticket' => $ticket,
+            'permissions' => [
+                'can_update_ticket' => $user->can('update', $ticket)
+            ]
         ]);
     }
 

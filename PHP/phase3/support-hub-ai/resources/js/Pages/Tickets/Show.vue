@@ -5,6 +5,7 @@ import { useForm, usePage } from '@inertiajs/vue3'; // <-- 1. Import useForm
 
 const props = defineProps({
     ticket: Object,
+    permissions: Object
 });
 
 // 2. Create a form helper for the reply form
@@ -105,6 +106,8 @@ const submitReply = () => {
             </form>
         </div>
          <form @submit.prevent="submitUpdate">
+                                <div v-if="permissions.can_update_ticket" class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+
                             <!-- Status -->
                             <div>
                                 <label for="status">Status</label>
@@ -131,6 +134,7 @@ const submitReply = () => {
                                     Update
                                 </button>
                             </div>
+                                </div>
                         </form>
 
             </div>
