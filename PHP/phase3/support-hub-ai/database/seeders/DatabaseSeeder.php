@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'adminpass'
         ]);
 
-        // $user = User::factory(10)->withPersonalTeam()->create();
+        // $user = User::factory(5)->withPersonalTeam()->create();
         $this->call([
             DepartmentSeeder::class,
             TicketSeeder::class

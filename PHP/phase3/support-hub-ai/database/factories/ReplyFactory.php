@@ -20,7 +20,7 @@ class ReplyFactory extends Factory
     {
         return [
             'ticket_id' => Ticket::factory(),
-            'user_id' => User::factory(),
+            'user_id' => User::factory()->withPersonalTeam(),
             'content' => fake()->paragraph(2,true),
             //
         ];
