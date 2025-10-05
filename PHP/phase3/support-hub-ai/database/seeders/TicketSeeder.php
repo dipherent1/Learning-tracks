@@ -35,7 +35,7 @@ class TicketSeeder extends Seeder
 
         Ticket::factory(15)
         ->for($depts->random())
-        ->has(Reply::factory()->count(rand(1,4)))
+        // ->has(Reply::factory()->count(rand(1,4)))
         ->create();
         //
     }

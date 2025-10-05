@@ -17,12 +17,15 @@ class TicketController extends Controller
     {
 
         $user = Auth::user();
-        $team = $user->currentTeam;
-
-
-        $ticketsQuery = $team->tickets()->with('user', 'department')
-        ->latest();
-
+        switch ($user->name) {
+            case "admin":
+                $ticketsQuery = Ticket::query()->with('user', 'department')->latest();
+                break;
+            default:
+                $team = $user->currentTeam;
+                $ticketsQuery = $team->tickets()->with('user', 'department')->latest();
+                break;
+        }
 
         $tickets = $ticketsQuery->paginate(10);
 
