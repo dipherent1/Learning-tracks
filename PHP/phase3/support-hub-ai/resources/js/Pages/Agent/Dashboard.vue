@@ -3,6 +3,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { defineProps } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import StatusBadge from '@/Components/StatusBadge.vue';
 
 const props = defineProps({
     tickets: Object,
@@ -38,7 +39,7 @@ const props = defineProps({
                                     <td class="p-4">{{ ticket.title }}</td>
                                     <td class="p-4">{{ ticket.team.name }}</td>
                                     <td class="p-4">{{ ticket.user.name }}</td>
-                                    <td class="p-4 capitalize">{{ ticket.status.replace('_', ' ') }}</td>
+                                    <td class="p-4"><StatusBadge :status="ticket.status"/></td>
                                     <td class="p-4">{{ new Date(ticket.created_at).toLocaleString() }}</td>
                                 </Link>
                             </tbody>
