@@ -5,6 +5,8 @@ use App\Http\Controllers\TicketController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\AgentDashboardController; // <-- Add this import
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -30,4 +32,8 @@ Route::middleware([
     ]);
 
     Route::post('/tickets/{ticket}/replies',[ReplyController::class, 'store'])->name('tickets.replies.store');
+
+    Route::get('/agent/dashboard', [AgentDashboardController::class, 'index'])
+    ->name('agent.dashboard')
+    ->middleware('can:view-agent-dashboard'); // <-- Protect with our Gate
 });

@@ -44,10 +44,8 @@ class TicketPolicy
      */
     public function update(User $user, Ticket $ticket): bool
     {
-        if ($user->isAdmin()){
-            return true;
-        }
-        return false;
+       return $user->isAdmin() || $user->isAgent();
+
     }
 
     /**
