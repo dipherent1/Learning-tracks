@@ -36,7 +36,8 @@ class ReplyPolicy
         }
 
         
-        return $user->id === $ticket->user_id;
+        return $user->belongsToTeam($ticket->team);
+
     }
 
     /**

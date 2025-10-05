@@ -24,7 +24,8 @@ class DatabaseSeeder extends Seeder
         // $user = User::factory(5)->withPersonalTeam()->create();
         $this->call([
             DepartmentSeeder::class,
-            TicketSeeder::class
+            TicketSeeder::class,
+            ReplySeeder::class,
 
         ]);
     }

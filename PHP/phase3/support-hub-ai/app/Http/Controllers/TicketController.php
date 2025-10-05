@@ -17,14 +17,11 @@ class TicketController extends Controller
     {
 
         $user = Auth::user();
+        $team = $user->currentTeam;
 
 
-        $ticketsQuery = Ticket::with('user', 'department')
+        $ticketsQuery = $team->tickets()->with('user', 'department')
         ->latest();
-        
-        if (! $user->isAdmin()){
-            $ticketsQuery->where('user_id',$user->id);
-        }
 
 
         $tickets = $ticketsQuery->paginate(10);
@@ -46,7 +43,16 @@ class TicketController extends Controller
     public function store(StoreTicketRequest $request)
     {
         $validatedData = $request->validated();
-        Auth::user()->tickets()->create($validatedData);
+        
+        $user = $request->user();
+
+
+        $user->currentTeam->tickets()->create([
+            'user_id' => $user->id,
+        'department_id' => $validatedData['department_id'],
+        'title' => $validatedData['title'],
+        'content' => $validatedData['content'],
+        ]);
 
         return to_route('tickets.index');
     }

@@ -34,24 +34,28 @@ class TicketFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (\App\Models\Ticket $ticket) {
-            // This closure runs AFTER a ticket has been created and saved to the DB.
+            $user = $ticket->user; // Get the user associated with the ticket
 
-            // If the ticket doesn't have a user, we create one.
-            if (! $ticket->user_id) {
-                // We create a user with a personal team, which is the Jetstream standard.
+            // If the ticket was created without a user, create one.
+            if (! $user) {
+                // Create a user with their personal team.
                 $user = User::factory()->withPersonalTeam()->create();
                 $ticket->user_id = $user->id;
             }
+            
+            $team = $user->currentTeam;
 
-            // Now, we ensure the ticket's team_id matches its user's team.
-            // $ticket->user is available because we just set the user_id.
-            if (! $ticket->team_id) {
-                // Get the user who owns this ticket and assign the ticket
-                // to that user's *current* team.
-                $ticket->team_id = $ticket->user->current_team_id;
+            // ** THE CRITICAL FIX IS HERE **
+            // Ensure the user is actually a member of the team in the pivot table.
+            if (! $user->belongsToTeam($team)) {
+                $user->teams()->attach($team, ['role' => 'editor']); // Use Jetstream's role system
+                $user->switchTeam($team);
             }
-
-            // Save the changes to the ticket model.
+            
+            // Assign the ticket to the user's team.
+            $ticket->team_id = $team->id;
+            
+            // Save all the changes.
             $ticket->save();
         });
     }

@@ -26,7 +26,8 @@ class TicketPolicy
         }
 
 
-        return $user->id == $ticket->user_id;
+        return $user->current_team_id == $ticket->team_id;
+        // return $user->belongsToTeam($ticket->team)
 
         }
 
