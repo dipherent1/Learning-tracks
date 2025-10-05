@@ -57,7 +57,7 @@ class TicketController extends Controller
         'content' => $validatedData['content'],
         ]);
 
-        return to_route('tickets.index');
+        return to_route('tickets.index')->with('flash.banner', 'Ticket Created Successfully');
     }
 
     public function show(Ticket $ticket)
@@ -81,7 +81,9 @@ class TicketController extends Controller
         $this->authorize('update', $ticket);
         $ticket->update($request->validated());
 
-        return to_route('tickets.show', $ticket);
+        return to_route('tickets.show', $ticket)
+         ->with('flash.banner', 'Ticket updated successfully!')
+        ->with('flash.bannerStyle', 'success');
     }
     //
 }

@@ -21,7 +21,7 @@ class ReplyController extends Controller
 
         ]);
 
-        return to_route('tickets.show',$ticket);
+        return to_route('tickets.show',$ticket)->with('flash.banner', 'Reply added successfully!');
 
     }
     //
