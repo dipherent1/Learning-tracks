@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AiAgents\SummarizationAgent;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Department;
@@ -85,5 +86,32 @@ class TicketController extends Controller
          ->with('flash.banner', 'Ticket updated successfully!')
         ->with('flash.bannerStyle', 'success');
     }
+
+    public function summarize(Ticket $ticket)
+    {
+        // 1. Authorize: Only users who can update a ticket can summarize it.
+        $this->authorize('update', $ticket);
+
+        // 2. Eager load the replies and their authors.
+        $ticket->load('replies.user');
+
+        // 3. Format the conversation into a simple string for the AI.
+        $formattedConversation = "Ticket created by {$ticket->user->name}:\n\"{$ticket->content}\"\n\n";
+        foreach ($ticket->replies as $reply) {
+            $formattedConversation .= "Reply from {$reply->user->name}:\n\"{$reply->content}\"\n\n";
+        }
+
+        // 4. Instantiate and run the agent.
+
+        $agent = SummarizationAgent::for('user-123');
+        $response = $agent->respond($formattedConversation);
+        // $agent = resolve(SummarizationAgent::class);
+        // $agent->conversation = $formattedConversation;
+        // $summary = $agent->run();
+
+        // 5. Return the summary as a JSON response.
+        return response()->json(['summary' => $response]);
+    }
+
     //
 }

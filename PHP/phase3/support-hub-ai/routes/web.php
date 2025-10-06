@@ -36,4 +36,7 @@ Route::middleware([
     Route::get('/agent/dashboard', [AgentDashboardController::class, 'index'])
     ->name('agent.dashboard')
     ->middleware('can:view-agent-dashboard'); // <-- Protect with our Gate
+
+    Route::post('/tickets/{ticket}/summarize', [TicketController::class, 'summarize'])
+    ->name('tickets.summarize');
 });
