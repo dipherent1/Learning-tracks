@@ -12,6 +12,7 @@
         "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "maestroerror/laragent": "^0.6.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
