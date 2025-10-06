@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AiAgents\SummarizationAgent;
+use App\Events\TicketCreated;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Department;
@@ -51,12 +52,15 @@ class TicketController extends Controller
         $user = $request->user();
 
 
-        $user->currentTeam->tickets()->create([
+        $ticket =$user->currentTeam->tickets()->create([
             'user_id' => $user->id,
         'department_id' => $validatedData['department_id'],
         'title' => $validatedData['title'],
         'content' => $validatedData['content'],
         ]);
+
+        TicketCreated::dispatch($ticket);
+
 
         return to_route('tickets.index')->with('flash.banner', 'Ticket Created Successfully');
     }
