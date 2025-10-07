@@ -60,13 +60,23 @@ class UserFactory extends Factory
 
         return $this->has(
             Team::factory()
-                ->state(fn (array $attributes, User $user) => [
-                    'name' => $user->name.'\'s Team',
-                    'user_id' => $user->id,
-                    'personal_team' => true,
-                ])
+                ->state(function (array $attributes, User $user) {
+                    return ['name' => $user->name.'\'s Team', 'user_id' => $user->id, 'personal_team' => true];
+                })
                 ->when(is_callable($callback), $callback),
             'ownedTeams'
-        );
+        )->afterCreating(function (User $user) { // <-- THE FIX STARTS HERE
+            // This code runs AFTER the user and their team have been created.
+            // It ensures the user is also a member of their own team.
+            
+            // Get the personal team that was just created.
+            $personalTeam = $user->personalTeam();
+
+            // Attach the user to their own team in the pivot table, giving them an admin role.
+            $user->teams()->attach($personalTeam, ['role' => 'admin']);
+
+            // Set this team as their current/active team.
+            $user->switchTeam($personalTeam);
+        }); // <-- THE FIX ENDS HERE
     }
 }

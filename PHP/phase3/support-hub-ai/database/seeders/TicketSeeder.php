@@ -3,40 +3,26 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
-use App\Models\Reply;
 use App\Models\Ticket;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TicketSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $depts = Department::all();
-        // $users = User::all()->random(5);
+        $departments = Department::all();
+        $users = User::all(); // Get all users created in DatabaseSeeder
 
-
-        // for($i = 0; $i<20;$i++){
-        //     $user = $users->random();
-        //     $dept = $depts->random();
-
-        //     Ticket::factory()
-        //         ->for($user)
-        //         ->for($dept)
-        //         ->has(Reply::factory()->count(rand(1,5)))
-        //         ->create();
-    
-
-        // }
-
-        Ticket::factory(15)
-        ->for($depts->random())
-        // ->has(Reply::factory()->count(rand(1,4)))
-        ->create();
-        //
+        // Create 20 tickets, each assigned to a random user and their team.
+        for ($i = 0; $i < 20; $i++) {
+            $user = $users->random();
+            
+            Ticket::factory()->create([
+                'user_id' => $user->id,
+                'team_id' => $user->current_team_id, // Assign to user's current team
+                'department_id' => $departments->random()->id,
+            ]);
+        }
     }
 }

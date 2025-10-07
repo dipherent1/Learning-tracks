@@ -29,10 +29,10 @@ class TriageTicketJob implements ShouldQueue // <-- This interface is crucial
         // // The response should be a JSON object, so we decode it.
         // $triageData = json_decode($response, true);
 
-        // // Update the ticket with the AI's analysis.
-        // $this->ticket->update([
-        //     'priority' => $triageData['priority'] ?? 'low',
-        //     'category' => $triageData['category'] ?? 'general',
-        // ]);
+        // Update the ticket with the AI's analysis.
+        $this->ticket->update([
+            'priority' => 'low',
+            'category' => 'general',
+        ]);
     }
 }

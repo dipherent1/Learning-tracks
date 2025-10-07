@@ -10,21 +10,22 @@ class ReplySeeder extends Seeder
 {
     public function run(): void
     {
-        // Get all the tickets that were created in the TicketSeeder.
         $tickets = Ticket::all();
 
-        // Let's add 15 replies in total, each to a random ticket.
-        for ($i = 0; $i < 15; $i++) {
-            // 1. Get a random ticket from the collection.
+        if ($tickets->isEmpty()) {
+            return;
+        }
+
+        // Add a total of 50 replies across all tickets
+        for ($i = 0; $i < 50; $i++) {
             $ticket = $tickets->random();
 
-            // 2. Get a random user who is a member of that ticket's team.
-            $user = $ticket->user_id;
+            // This now works, because the UserFactory guarantees the team has members.
+            $user = $ticket->team->users->random();
 
-            // 3. Use the ReplyFactory to create ONE reply with the correct data.
             Reply::factory()->create([
                 'ticket_id' => $ticket->id,
-                'user_id' => $user,
+                'user_id' => $user->id,
             ]);
         }
     }

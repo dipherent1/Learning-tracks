@@ -14,10 +14,9 @@ class TicketFactory extends Factory
         // We will remove user_id and team_id from here,
         // as they will be handled by our smart configuration.
 
-        $user = User::factory()->withPersonalTeam()->create();
-        return [
-            'user_id' => $user->id,
-            'team_id' => $user->currentTeam,
+            return [
+            'user_id' => User::factory()->withPersonalTeam(),
+            'team_id' => null,
             'department_id' => Department::factory(),
             'title' => fake()->sentence(),
             'content' => fake()->paragraph(3, true),
