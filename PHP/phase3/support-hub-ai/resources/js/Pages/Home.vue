@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 defineProps({
     canLogin: Boolean,
@@ -10,9 +11,9 @@ defineProps({
 <template>
     <Head title="Welcome to SupportHub AI" />
 
-    <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
-        <div class="relative min-h-screen flex flex-col items-center justify-center">
-            <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
+    <div class="bg-gray-50 text-slate-800 min-h-screen">
+        <div class="relative flex flex-col items-center">
+            <div class="container-pro py-20">
                 <header class="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
                     <div class="flex lg:justify-center lg:col-start-2">
                        <!-- You can put your logo here -->
@@ -40,22 +41,40 @@ defineProps({
                     </nav>
                 </header>
 
-                <main class="mt-20">
-                    <div class="text-center">
-                        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                <main>
+                    <div class="text-center max-w-3xl mx-auto">
+                        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
                             The Smartest Way to Manage Customer Support
                         </h1>
-                        <p class="mt-6 text-lg leading-8 text-gray-600">
-                            SupportHub AI integrates the power of Gemini to help your agents resolve tickets faster.
-                            Automate triage, summarize conversations, and deliver better support.
+                        <p class="mt-4 text-lg text-slate-600">
+                            SupportHub AI helps agents focus on what matters. Triage, summarize, and automate repetitive tasks with a simple interface.
                         </p>
-                        <div class="mt-10 flex items-center justify-center gap-x-6">
-                            <Link :href="route('register')" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                                Get started
+
+                        <div class="mt-8 flex items-center justify-center gap-4">
+                            <Link :href="route('register')">
+                                <PrimaryButton>Get started</PrimaryButton>
                             </Link>
-                            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
+
+                            <Link href="#" class="text-sm font-semibold text-slate-700 hover:text-primary-600">Learn more →</Link>
                         </div>
                     </div>
+
+                    <section class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="card p-6">
+                            <h3 class="font-semibold text-lg">Smart Triage</h3>
+                            <p class="mt-2 text-sm text-slate-600">Automatically prioritize tickets so your team handles urgent issues first.</p>
+                        </div>
+
+                        <div class="card p-6">
+                            <h3 class="font-semibold text-lg">Agent Assist</h3>
+                            <p class="mt-2 text-sm text-slate-600">Summaries and suggested replies to speed up resolutions.</p>
+                        </div>
+
+                        <div class="card p-6">
+                            <h3 class="font-semibold text-lg">Easy Collaboration</h3>
+                            <p class="mt-2 text-sm text-slate-600">Assign, comment, and manage tickets with a clear workflow.</p>
+                        </div>
+                    </section>
                 </main>
             </div>
         </div>

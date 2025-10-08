@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import StatusBadge from '@/Components/StatusBadge.vue';
 import { defineProps, ref } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { useEcho } from "@laravel/echo-vue";
@@ -75,30 +76,22 @@ useEcho(
 <template>
     <AppLayout :title="`Ticket #${ticket.id}`">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Ticket #{{ ticket.id }}: {{ ticket.title }}
-            </h2>
+            <h2 class="font-semibold text-xl text-slate-900 leading-tight">Ticket #{{ ticket.id }}: {{ ticket.title }}</h2>
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="container-pro grid grid-cols-1 md:grid-cols-3 gap-8">
 
                 <!-- MAIN CONTENT (Left Column) -->
                 <div class="md:col-span-2 space-y-6">
                     <!-- Main Ticket Details -->
-                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 lg:p-8">
+                    <div class="card p-6">
                         <div class="border-b pb-4 mb-4">
-                            <p class="text-gray-600">
-                                <strong>Status:</strong> <span class="capitalize">{{ ticket.status.replace('_', ' ') }}</span>
-                            </p>
-                            <p class="text-gray-600">
-                                <strong>Department:</strong> {{ ticket.department.name }}
-                            </p>
-                            <p class="text-gray-600">
-                                <strong>Created by:</strong> {{ ticket.user.name }} on {{ new Date(ticket.created_at).toLocaleString() }}
-                            </p>
+                            <p class="text-sm text-slate-700"><strong>Status:</strong> <StatusBadge :status="ticket.status" /></p>
+                            <p class="text-sm text-slate-700"><strong>Department:</strong> {{ ticket.department.name }}</p>
+                            <p class="text-sm text-slate-700"><strong>Created by:</strong> {{ ticket.user.name }} on {{ new Date(ticket.created_at).toLocaleString() }}</p>
                         </div>
-                        <div class="prose max-w-none">
+                        <div class="prose max-w-none text-slate-800">
                             <p>{{ ticket.content }}</p>
                         </div>
                     </div>
@@ -109,81 +102,67 @@ useEcho(
                             Conversation
                         </h3>
                         <!-- Loop through replies -->
-                        <div v-for="reply in ticket.replies" :key="reply.id" class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                            <p class="font-bold">{{ reply.user.name }}</p>
-                            <p class="text-xs text-gray-500 mb-2">{{ new Date(reply.created_at).toLocaleString() }}</p>
-                            <div class="prose max-w-none whitespace-pre-wrap">{{ reply.content }}</div>
+                        <div v-for="reply in ticket.replies" :key="reply.id" class="card p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-semibold text-sm text-slate-900">{{ reply.user.name }}</p>
+                                    <p class="text-xs text-slate-500 mb-2">{{ new Date(reply.created_at).toLocaleString() }}</p>
+                                </div>
+                            </div>
+                            <div class="prose max-w-none whitespace-pre-wrap mt-2 text-slate-700">{{ reply.content }}</div>
                         </div>
 
                         <!-- No replies message -->
-                        <div v-if="!ticket.replies.length" class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                        <div v-if="!ticket.replies.length" class="bg-surface overflow-hidden shadow-xl sm:rounded-lg p-6">
                             <p>No replies yet.</p>
                         </div>
                     </div>
 
                     <!-- Reply Form -->
-                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                        <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
-                           Add a Reply
-                       </h3>
-                       <form @submit.prevent="submitReply">
-                           <textarea
-                               v-model="replyForm.content"
-                               rows="5"
-                               class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                               placeholder="Type your reply..."
-                           ></textarea>
-                           <div v-if="replyForm.errors.content" class="text-sm text-red-600 mt-1">{{ replyForm.errors.content }}</div>
+                    <div class="card p-6">
+                        <h3 class="font-semibold text-lg text-slate-900 mb-4">Add a Reply</h3>
+                        <form @submit.prevent="submitReply">
+                            <textarea v-model="replyForm.content" rows="5" class="w-full border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm" placeholder="Type your reply..."></textarea>
+                            <div v-if="replyForm.errors.content" class="text-sm text-red-600 mt-1">{{ replyForm.errors.content }}</div>
 
-                           <div class="flex justify-end mt-4">
-                                <button type="submit" :disabled="replyForm.processing" class="px-4 py-2 bg-primary-600 text-white rounded-md">
-                                   Submit Reply
-                               </button>
-                           </div>
-                       </form>
-                   </div>
+                            <div class="flex justify-end mt-4">
+                                <button type="submit" :disabled="replyForm.processing" class="btn-primary">Submit Reply</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- SIDEBAR (Right Column) -->
                 <div class="space-y-6">
                     <!-- Agent Actions Form -->
-                    <div v-if="permissions.can_update_ticket" class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                        <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
-                            Ticket Details
-                        </h3>
+                    <div v-if="permissions.can_update_ticket" class="card p-6">
+                        <h3 class="font-semibold text-lg text-slate-900 mb-4">Ticket Details</h3>
                         <form @submit.prevent="submitUpdate">
-                            <!-- Status -->
                             <div>
-                                <label for="status" class="block font-medium text-sm text-gray-700">Status</label>
-                                <select id="status" v-model="updateForm.status" class="block w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <label for="status" class="block font-medium text-sm text-slate-700">Status</label>
+                                <select id="status" v-model="updateForm.status" class="block w-full mt-1 border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
                                     <option value="open">Open</option>
                                     <option value="in_progress">In Progress</option>
                                     <option value="closed">Closed</option>
                                 </select>
                             </div>
 
-                            <!-- Assign Agent -->
                             <div class="mt-4">
-                                <label for="agent" class="block font-medium text-sm text-gray-700">Assign Agent</label>
-                                <select id="agent" v-model="updateForm.agent_id" class="block w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <label for="agent" class="block font-medium text-sm text-slate-700">Assign Agent</label>
+                                <select id="agent" v-model="updateForm.agent_id" class="block w-full mt-1 border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
                                     <option :value="null">Unassigned</option>
-                                    <option v-for="user in users" :key="user.id" :value="user.id">
-                                        {{ user.name }}
-                                    </option>
+                                    <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
                                 </select>
                             </div>
 
                             <div class="flex justify-end mt-4">
-                                <button type="submit" :disabled="updateForm.processing" class="px-4 py-2 bg-primary-600 text-white rounded-md">
-                                    Update
-                                </button>
+                                <button type="submit" :disabled="updateForm.processing" class="btn-primary">Update</button>
                             </div>
                         </form>
-                        
-                        <!-- AI Summarize Button -->
+
                         <div class="border-t mt-6 pt-6">
-                            <button @click="getSummary" :disabled="isLoadingSummary" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md flex items-center justify-center hover:bg-blue-700 disabled:opacity-50">
-                                <svg v-if="isLoadingSummary" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <button @click="getSummary" :disabled="isLoadingSummary" class="w-full btn-primary flex items-center justify-center gap-2">
+                                <svg v-if="isLoadingSummary" class="animate-spin -ml-1 mr-0 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -194,7 +173,7 @@ useEcho(
                     </div>
 
                     <!-- AI Summary Display -->
-                    <div v-if="summary" class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                    <div v-if="summary" class="bg-surface overflow-hidden shadow-xl sm:rounded-lg p-6">
                         <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
                             AI Summary
                         </h3>

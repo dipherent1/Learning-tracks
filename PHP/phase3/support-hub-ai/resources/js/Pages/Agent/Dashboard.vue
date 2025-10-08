@@ -41,8 +41,8 @@ watch(filterForm, () => {
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="container-pro">
+                <div class="card overflow-hidden">
                     <!-- FILTER SECTION (NEW) -->
                     <div class="p-6 bg-gray-50 border-b border-gray-200">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -68,19 +68,19 @@ watch(filterForm, () => {
                     </div>
 
                     <!-- TABLE SECTION -->
-                    <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-                        <table class="w-full text-left">
+                    <div class="p-6 lg:p-8 bg-surface border-b border-gray-200 overflow-x-auto">
+                        <table class="w-full text-left min-w-full table-auto">
                             <!-- ... thead is unchanged ... -->
                             <tbody>
                                 <Link as="tr" v-for="ticket in tickets.data" :key="ticket.id" :href="route('tickets.show', ticket.id)" class="border-b hover:bg-gray-100 cursor-pointer">
                                     <td class="p-4">{{ ticket.id }}</td>
-                                    <td class="p-4">{{ ticket.title }}</td>
+                                    <td class="p-4"><div class="truncate-title" :title="ticket.title">{{ ticket.title }}</div></td>
                                     <td class="p-4">{{ ticket.team.name }}</td>
                                     <td class="p-4">{{ ticket.user.name }}</td>
                                     <td class="p-4">
                                         <StatusBadge :status="ticket.status" />
                                     </td>
-                                    <td class="p-4">{{ new Date(ticket.created_at).toLocaleString() }}</td>
+                                    <td class="p-4 whitespace-nowrap text-sm text-slate-500">{{ new Date(ticket.created_at).toLocaleString() }}</td>
                                 </Link>
                                 <!-- No results message -->
                                 <tr v-if="tickets.data.length === 0">
@@ -94,7 +94,7 @@ watch(filterForm, () => {
                         <div class="flex flex-wrap -mb-1">
                             <template v-for="(link, key) in tickets.links" :key="key">
                                 <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded" v-html="link.label" />
-                                <Link v-else class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500" :class="{ 'bg-white': link.active }" :href="link.url" v-html="link.label" />
+                                <Link v-else class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-surface focus:border-indigo-500 focus:text-indigo-500" :class="{ 'bg-surface': link.active }" :href="link.url" v-html="link.label" />
                             </template>
                         </div>
                     </div>

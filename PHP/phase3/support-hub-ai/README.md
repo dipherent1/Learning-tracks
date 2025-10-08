@@ -59,3 +59,42 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## SupportHub — UI/UX polish notes
+
+This repository contains a small Laravel + Inertia + Vue 3 app. I polished the UI to make the project presentation-ready for sharing on LinkedIn.
+
+What I changed
+
+- Global theme adjustments and Tailwind extensions for a professional palette.
+- New utilities: `.container-pro`, `.card`, and button variants (`.btn-primary`, `.btn-secondary`, `.btn-danger`).
+- Status badges with dot indicators and non-wrapping labels.
+- Card-based layouts for ticket list, create, and show pages.
+- Truncation + tooltip for long ticket titles in narrow viewports.
+
+How to run locally
+
+1. Install dependencies and run the dev tools:
+
+```bash
+npm install
+npm run dev
+php artisan serve
+```
+
+2. Visit the app at the URL shown by `php artisan serve`.
+
+LinkedIn-ready caption (short)
+
+"Polished a small Laravel + Inertia app to make it presentation-ready — improved navigation, card layouts, and responsive status badges. Built with Laravel, Inertia, Vue 3, and Tailwind CSS."
+
+Suggested screenshots
+
+1. Landing / Hero (wide viewport)
+2. Tickets list (show status badges and truncated titles)
+3. Ticket detail (conversation + AI summary)
+4. Agent dashboard with filters
+
+If you want, I can also generate mock screenshot images and short social captions (Twitter/LinkedIn) you can paste directly into your post.

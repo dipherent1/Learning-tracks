@@ -32,9 +32,9 @@ const submit = () => {
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
+            <div class="container-pro">
+                <div class="card">
+                    <div class="p-6 lg:p-8 bg-surface border-b border-gray-100">
                         <form @submit.prevent="submit">
                             <!-- Title -->
                             <div>
@@ -64,9 +64,7 @@ const submit = () => {
 
                             <!-- Submit Button -->
                             <div class="flex items-center justify-end mt-4">
-                                <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-primary-600 text-white rounded-md">
-                                    Create Ticket
-                                </button>
+                                <button type="submit" :disabled="form.processing" class="btn-primary">Create Ticket</button>
                             </div>
                         </form>
                     </div>

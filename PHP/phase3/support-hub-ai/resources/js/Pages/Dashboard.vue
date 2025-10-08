@@ -21,18 +21,18 @@ defineProps({
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Stat Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-lg shadow-xl">
+                    <div class="bg-surface p-6 rounded-lg shadow-xl">
                         <h3 class="text-gray-500 text-sm font-medium">Open Tickets</h3>
                         <p class="text-3xl font-semibold text-gray-900">{{ stats.open_tickets }}</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-xl">
+                    <div class="bg-surface p-6 rounded-lg shadow-xl">
                         <h3 class="text-gray-500 text-sm font-medium">Total Tickets</h3>
                         <p class="text-3xl font-semibold text-gray-900">{{ stats.total_tickets }}</p>
                     </div>
                 </div>
 
                 <!-- Recent Tickets -->
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <div class="bg-surface overflow-hidden shadow-xl sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="font-semibold text-lg text-gray-800 leading-tight mb-4">
                             Your Most Recent Tickets

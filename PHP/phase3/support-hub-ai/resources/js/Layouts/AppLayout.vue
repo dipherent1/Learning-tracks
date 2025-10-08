@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -26,26 +26,55 @@ const switchToTeam = (team) => {
 const logout = () => {
     router.post(route('logout'));
 };
+
+const toggleDark = () => {
+    if (typeof document === 'undefined') return;
+
+    const isDark = document.documentElement.classList.toggle('dark');
+
+    try {
+        localStorage.setItem('supporthub:dark', isDark ? '1' : '0');
+    } catch (e) {
+        // ignore
+    }
+
+    // If a global tooltip init exists, call it to re-theme tooltips
+    if (typeof window !== 'undefined' && typeof window.initTooltips === 'function') {
+        try { window.initTooltips(); } catch (e) { /* ignore */ }
+    }
+};
+
+onMounted(() => {
+    try {
+        const pref = localStorage.getItem('supporthub:dark');
+        if (pref === '1' && typeof document !== 'undefined') {
+            document.documentElement.classList.add('dark');
+        }
+    } catch (e) {
+        // ignore
+    }
+});
 </script>
 
 <template>
-    <div>
-        <FlashMessage /> <!-- <-- PLACE IT HERE -->
+    <div class="min-h-screen bg-gray-50 text-slate-900">
+        <FlashMessage />
 
         <Head :title="title" />
 
         <Banner />
 
-        <div class="min-h-screen bg-gray-100">
-            <nav class="bg-white border-b border-gray-100">
+        <div class="min-h-screen">
+            <nav class="bg-surface border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="container-pro">
                     <div class="flex justify-between h-16">
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                                <Link :href="route('dashboard')" class="flex items-center gap-3">
                                     <ApplicationMark class="block h-9 w-auto" />
+                                    <span class="font-semibold text-lg text-primary-700">SupportHub</span>
                                 </Link>
                             </div>
 
@@ -81,12 +110,18 @@ const logout = () => {
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
+                            <!-- Dark mode toggle -->
+                            <div class="me-4 flex items-center">
+                                <button @click="toggleDark" class="inline-flex items-center px-2 py-1 border rounded text-sm bg-surface dark:bg-slate-800">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 2.03a1 1 0 010 1.414l-.7.7a1 1 0 11-1.414-1.414l.7-.7a1 1 0 011.414 0zM18 9a1 1 0 010 2h-1a1 1 0 110-2h1zM14.22 15.97a1 1 0 01-1.414 0l-.7-.7a1 1 0 011.414-1.414l.7.7a1 1 0 010 1.414zM10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.78 15.97a1 1 0 010-1.414l.7-.7a1 1 0 111.414 1.414l-.7.7a1 1 0 01-1.414 0zM4 9a1 1 0 110 2H3a1 1 0 110-2h1zM5.78 4.03a1 1 0 011.414 0l.7.7A1 1 0 116.9 6.15l-.7-.7a1 1 0 010-1.414z"/></svg>
+                                </button>
+                            </div>
                             <div class="ms-3 relative">
                                 <!-- Teams Dropdown -->
                                 <Dropdown v-if="$page.props.jetstream.hasTeamFeatures" align="right" width="60">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
+                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-surface hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
                                                 {{ $page.props.auth.user.current_team.name }}
 
                                                 <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -148,7 +183,7 @@ const logout = () => {
                                         </button>
 
                                         <span v-else class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
+                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-surface hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
                                                 {{ $page.props.auth.user.name }}
 
                                                 <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -300,16 +335,26 @@ const logout = () => {
             </nav>
 
             <!-- Page Heading -->
-            <header v-if="$slots.header" class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <header v-if="$slots.header" class="bg-surface shadow-sm">
+                <div class="container-pro py-6">
                     <slot name="header" />
                 </div>
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="container-pro py-8">
                 <slot />
             </main>
+
+            <footer class="border-t border-gray-100 bg-surface">
+                <div class="container-pro py-6 flex justify-between items-center text-sm text-gray-500">
+                    <div>© {{ new Date().getFullYear() }} SupportHub</div>
+                    <div class="flex items-center gap-4">
+                        <Link href="/privacy" class="hover:text-primary-600">Privacy</Link>
+                        <Link href="/terms" class="hover:text-primary-600">Terms</Link>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 </template>
