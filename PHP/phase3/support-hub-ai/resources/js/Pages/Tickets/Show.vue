@@ -2,7 +2,10 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { defineProps, ref } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
+import { useEcho } from "@laravel/echo-vue";
+
 import axios from 'axios';
+
 
 const props = defineProps({
     ticket: Object,
@@ -46,6 +49,27 @@ const getSummary = async () => {
         isLoadingSummary.value = false;
     }
 };
+
+
+useEcho(
+    `tickets.${props.ticket.id}`,
+    "ReplyAdded",
+    (e) => {
+        console.log(e.reply);
+    },
+);
+
+// onMounted(() => {
+//     window.Echo.private(`tickets.${props.ticket.id}`)
+//         .listen('ReplyAdded', (e) => {
+//             props.ticket.replies.push(e.reply);
+//         });
+// });
+
+// onUnmounted(() => {
+//     window.Echo.leaveChannel(`tickets.${props.ticket.id}`);
+// });
+
 </script>
 
 <template>
@@ -182,3 +206,4 @@ const getSummary = async () => {
         </div>
     </AppLayout>
 </template>
+
