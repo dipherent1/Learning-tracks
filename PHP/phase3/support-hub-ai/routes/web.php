@@ -6,16 +6,20 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\AgentDashboardController; // <-- Add this import
+use App\Http\Controllers\HomeController; // <-- Add this
 
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 
 Route::middleware([
     'auth:sanctum',
@@ -23,7 +27,25 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        $user = auth()->user();
+        
+        // Fetch tickets belonging to the user's current team
+        $tickets = $user->currentTeam->tickets()
+                          ->with('user', 'department')
+                          ->latest()
+                          ->take(5) // Get the 5 most recent
+                          ->get();
+        
+        // Get stats
+        $stats = [
+            'open_tickets' => $user->currentTeam->tickets()->where('status', 'open')->count(),
+            'total_tickets' => $user->currentTeam->tickets()->count(),
+        ];
+
+        return Inertia::render('Dashboard', [
+            'stats' => $stats,
+            'recentTickets' => $tickets,
+        ]);
     })->name('dashboard');
 
     // Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');

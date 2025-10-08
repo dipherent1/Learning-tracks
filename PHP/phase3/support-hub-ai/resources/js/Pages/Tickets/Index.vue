@@ -16,7 +16,7 @@ const props = defineProps({
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Support Tickets
             </h2>
-            <Link :href="route('tickets.create')" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+            <Link :href="route('tickets.create')" class="px-4 py-2 bg-primary-600 text-white rounded-md">
                 Create Ticket
             </Link>
 

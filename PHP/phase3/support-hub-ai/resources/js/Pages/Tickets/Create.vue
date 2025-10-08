@@ -64,7 +64,7 @@ const submit = () => {
 
                             <!-- Submit Button -->
                             <div class="flex items-center justify-end mt-4">
-                                <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                                <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-primary-600 text-white rounded-md">
                                     Create Ticket
                                 </button>
                             </div>

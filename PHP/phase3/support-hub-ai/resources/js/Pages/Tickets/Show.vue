@@ -136,7 +136,7 @@ useEcho(
                            <div v-if="replyForm.errors.content" class="text-sm text-red-600 mt-1">{{ replyForm.errors.content }}</div>
 
                            <div class="flex justify-end mt-4">
-                                <button type="submit" :disabled="replyForm.processing" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                                <button type="submit" :disabled="replyForm.processing" class="px-4 py-2 bg-primary-600 text-white rounded-md">
                                    Submit Reply
                                </button>
                            </div>
@@ -174,7 +174,7 @@ useEcho(
                             </div>
 
                             <div class="flex justify-end mt-4">
-                                <button type="submit" :disabled="updateForm.processing" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                                <button type="submit" :disabled="updateForm.processing" class="px-4 py-2 bg-primary-600 text-white rounded-md">
                                     Update
                                 </button>
                             </div>
