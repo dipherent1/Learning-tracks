@@ -39,4 +39,8 @@ Route::middleware([
 
     Route::post('/tickets/{ticket}/summarize', [TicketController::class, 'summarize'])
     ->name('tickets.summarize');
+    Route::get('/agent/my-tickets', [AgentDashboardController::class, 'myTickets'])
+    ->name('agent.tickets.my')
+    ->middleware('can:view-agent-dashboard'); // Reuse the same gate for protection
+
 });

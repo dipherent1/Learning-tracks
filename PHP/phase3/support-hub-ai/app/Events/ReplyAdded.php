@@ -31,7 +31,7 @@ class ReplyAdded implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('tickets.{$this->reply->ticket_id}'),
+            new PrivateChannel("tickets.{$this->reply->ticket_id}"),
         ];
     }
 

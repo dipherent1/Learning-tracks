@@ -57,10 +57,23 @@ const logout = () => {
                                 </NavLink>
 
                                 <NavLink v-if="$page.props.auth.user.role === 'admin' || $page.props.auth.user.role === 'agent'" 
-             :href="route('agent.dashboard')" 
-             :active="route().current('agent.dashboard')">
-        Agent Dashboard
-    </NavLink>
+                                    :href="route('agent.dashboard')" 
+                                    :active="route().current('agent.dashboard')">
+                                    Agent Dashboard
+                                </NavLink>
+
+                                <NavLink v-if="$page.props.auth.user.role === 'admin' || $page.props.auth.user.role === 'agent'" 
+                                    :href="route('agent.dashboard')" 
+                                    :active="route().current('agent.dashboard')">
+                                    All Tickets
+                            </NavLink>
+
+                            <!-- ADD THIS NEW LINK -->
+                            <NavLink v-if="$page.props.auth.user.role === 'admin' || $page.props.auth.user.role === 'agent'" 
+                                    :href="route('agent.tickets.my')" 
+                                    :active="route().current('agent.tickets.my')">
+                                My Tickets
+                            </NavLink>
                             </div>
                         </div>
 
