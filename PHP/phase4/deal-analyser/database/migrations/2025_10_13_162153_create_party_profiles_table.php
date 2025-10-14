@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('party_profiles', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('deal_id')->constrained('deals')->onDelete('cascade');
+            $table->string('name');
+            $table->enum('type', ['vendor', 'client', 'partner', 'investor'])->nullable();
+            $table->decimal('reputation_score', 5, 2)->nullable();
+            $table->text('summary')->nullable();
             $table->timestamps();
         });
     }

@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('company_expenses', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('company_id')->constrained('company_profiles')->onDelete('cascade');
+            $table->string('category');
+            $table->decimal('amount', 15, 2);
+            $table->tinyInteger('usage')->default(3);
+            $table->tinyInteger('importance')->default(3);
+            $table->tinyInteger('quality')->default(3);
             $table->timestamps();
         });
     }

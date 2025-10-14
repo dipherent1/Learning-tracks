@@ -10,4 +10,18 @@ class CompanyExpense extends Model
 {
     /** @use HasFactory<\Database\Factories\CompanyExpenseFactory> */
     use HasFactory, HasUuids;
+
+    protected $fillable = [
+        'company_id',
+        'category',
+        'amount',
+        'usage',
+        'importance',
+        'quality'
+    ];
+
+    public function company()
+    {
+        return $this->belongsTo(CompanyProfile::class, 'company_id');
+    }
 }

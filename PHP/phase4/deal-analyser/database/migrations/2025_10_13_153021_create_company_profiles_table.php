@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('company_profiles', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('industry')->nullable();
+            $table->text('description')->nullable();
+            $table->string('location')->nullable();
+            $table->integer('size')->nullable();
+            $table->decimal('revenue',15,2)->nullable();
             $table->timestamps();
         });
     }
