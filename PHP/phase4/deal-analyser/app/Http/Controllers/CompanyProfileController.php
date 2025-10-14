@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CompanyProfile;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class CompanyProfileController extends Controller
 {
@@ -43,7 +44,9 @@ class CompanyProfileController extends Controller
     
     public function store(Request $request)
     {
-        $validated = $request->validate([
+    Log::info('CompanyProfile store payload', ['all' => $request->all()]);
+
+    $validated = $request->validate([
            'name' => 'required|string|max:255',
             'industry' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -51,6 +54,8 @@ class CompanyProfileController extends Controller
             'size' => 'nullable|integer',
             'revenue' => 'nullable|numeric',
         ]);
+
+    Log::info('CompanyProfile validated payload', ['validated' => $validated]);
 
         $company = CompanyProfile::create([
             'user_id' => auth()->id(),
