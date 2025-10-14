@@ -4,20 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\CompanyProfile;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CompanyProfileController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('company.create');
+        // If the user already has a company profile, pass it so the form can be used for editing
+        $company = $request->user()->companyProfile;
+
+        return Inertia::render('Company/Create', [
+            'company' => $company,
+        ]);
     }
-    
-    // public function index()
-    // {
 
-    // }
-
-    public function update(Request $request)
+    public function update(Request $request, CompanyProfile $companyProfile)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -28,19 +29,20 @@ class CompanyProfileController extends Controller
             'revenue' => 'nullable|numeric',
         ]);
 
-        $companyProfile = CompanyProfile::findOrFail($request->input('id'));
         $companyProfile->update($validated);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('company.show', $companyProfile->id);
     }
 
     public function show(CompanyProfile $companyProfile)
     {
-        return view('company.show', compact('companyProfile'));
+        return Inertia::render('Company/Show', [
+            'company' => $companyProfile,
+        ]);
     }
     
-    public function store(Request $request){
-
+    public function store(Request $request)
+    {
         $validated = $request->validate([
            'name' => 'required|string|max:255',
             'industry' => 'nullable|string|max:255',
@@ -50,12 +52,12 @@ class CompanyProfileController extends Controller
             'revenue' => 'nullable|numeric',
         ]);
 
-         CompanyProfile::create([
+        $company = CompanyProfile::create([
             'user_id' => auth()->id(),
             ...$validated
         ]);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('company.show', $company->id);
 
     }
 }
