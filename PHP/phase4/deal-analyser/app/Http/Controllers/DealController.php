@@ -37,7 +37,7 @@ class DealController extends Controller
         }
         $user = $request->user();
         $company = $user->companyProfile;
-        Deal::create([
+        $deal =Deal::create([
             'user_id' => $user->id,
             'company_id' => $company->id,
             'value_estimate' => $validated['value_estimate'] ?? null,
@@ -47,7 +47,7 @@ class DealController extends Controller
             'image_path' => $imagePath,
         ]);
 
-        return redirect()->route('deals.index')->with('success', 'Deal created successfully!');
+        return redirect()->route('deals.show', $deal)->with('success', 'Deal created successfully!');
     }
 
 
