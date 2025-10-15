@@ -12,6 +12,13 @@ class CompanyProfileController extends Controller
     public function create(Request $request)
     {
         // If the user already has a company profile, pass it so the form can be used for editing
+        return Inertia::render('Company/Create');
+
+    }
+
+    public function edit(Request $request)
+    {
+        // If the user already has a company profile, pass it so the form can be used for editing
         $company = $request->user()->companyProfile;
 
         return Inertia::render('Company/Create', [
@@ -36,10 +43,10 @@ class CompanyProfileController extends Controller
 
     }
 
-    public function show(CompanyProfile $companyProfile)
+    public function show(CompanyProfile $company)
     {
         return Inertia::render('Company/Show', [
-            'company' => $companyProfile,
+            'company' => $company,
         ]);
     }
     

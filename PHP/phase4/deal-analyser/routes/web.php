@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function(){
-    Route::resource('/company', CompanyProfileController::class)->only(['store', 'create', 'update', 'show']);
+    Route::resource('/company', CompanyProfileController::class)->only(['store', 'create', 'update', 'show', 'edit']);
 });
 
 require __DIR__.'/auth.php';
