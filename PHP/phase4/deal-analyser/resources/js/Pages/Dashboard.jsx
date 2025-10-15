@@ -42,6 +42,16 @@ export default function Dashboard({ auth }) {
                                     Create Company Profile
                                 </Link>
                             )}
+
+                            <div className="mt-6">
+                                <Link
+                                    href={route('deals.index')}
+                                    className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                    View All Deals
+                                </Link>
+                                
+                            </div>
                         </div>
                     </div>
                 </div>

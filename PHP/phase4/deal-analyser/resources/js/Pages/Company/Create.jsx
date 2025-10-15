@@ -28,6 +28,7 @@ export default function Create({ errors, company }) {
         put(route('company.update', company.id)); // <-- Correct
     } else {
         // The `post` helper will automatically send the form data.
+        console.log('Creating company...');
         post(route('company.store')); // <-- Correct
     }
 };

@@ -9,18 +9,14 @@ use Illuminate\Support\Facades\Log;
 
 class CompanyProfileController extends Controller
 {
-    public function create(Request $request)
+    public function create()
     {
-        // If the user already has a company profile, pass it so the form can be used for editing
         return Inertia::render('Company/Create');
 
     }
 
-    public function edit(Request $request)
+    public function edit(CompanyProfile $company)
     {
-        // If the user already has a company profile, pass it so the form can be used for editing
-        $company = $request->user()->companyProfile;
-
         return Inertia::render('Company/Create', [
             'company' => $company,
         ]);
@@ -52,6 +48,7 @@ class CompanyProfileController extends Controller
     
     public function store(Request $request)
     {
+    // dd($request->all());
     Log::info('CompanyProfile store payload', ['all' => $request->all()]);
 
     $validated = $request->validate([

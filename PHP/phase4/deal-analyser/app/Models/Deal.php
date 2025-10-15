@@ -18,7 +18,8 @@ class Deal extends Model
         'description',
         'value_estimate',
         'duration_months',
-        'status'
+        'status',
+        'image_path'
     ];
 
     public function company()

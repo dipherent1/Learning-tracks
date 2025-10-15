@@ -15,11 +15,12 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('company_id')->constrained('company_profiles')->onDelete('cascade');
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->decimal('value_estimate', 15, 2)->nullable();
             $table->integer('duration_months')->nullable();
             $table->enum('status',['draft', 'review', 'validated', 'accepted',])->default('draft');
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }

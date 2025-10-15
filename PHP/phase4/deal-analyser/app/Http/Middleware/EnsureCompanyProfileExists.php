@@ -20,16 +20,9 @@ class EnsureCompanyProfileExists
             return redirect()->route('login');
         }
        
-        // Allow access to '/', 'login', and 'register' endpoints without company profile
-        if (
-            $user &&
-            !$user->companyProfile() &&
-            !$request->is('/') &&
-            !$request->is('login') &&
-            !$request->is('register') &&
-            !$request->is('company/create')
-        ) {
-            return redirect()->route('company.create');
+        if (!$request->user()->companyProfile) {
+            return redirect()->route('company.create')
+                   ->with('error', 'You must create a company profile to continue.');
         }
 
         
