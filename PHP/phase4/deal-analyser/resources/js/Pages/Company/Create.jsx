@@ -22,14 +22,16 @@ export default function Create({ errors, company }) {
     }, []);
 
     const submit = (e) => {
-        e.preventDefault();
-        if (company) {
-            // update via PUT to /company/{id}
-            put(route('company.update', company.id), { data });
-        } else {
-            post(route('company.store'), { data });
-        }
-    };
+    e.preventDefault();
+    if (company) {
+        // The `put` helper will automatically send the form data.
+        put(route('company.update', company.id)); // <-- Correct
+    } else {
+        // The `post` helper will automatically send the form data.
+        post(route('company.store')); // <-- Correct
+    }
+};
+
 
     return (
         <AuthenticatedLayout

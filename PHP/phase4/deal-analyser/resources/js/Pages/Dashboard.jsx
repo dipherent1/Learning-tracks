@@ -1,8 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
-export default function Dashboard() {
-    const user = usePage().props.auth.user;
+// The usePage hook is the standard way to access shared data like the auth user
+import { usePage } from '@inertiajs/react';
+
+export default function Dashboard({ auth }) {
+    // Destructure companyProfile directly from the user prop for cleaner access
+    const { companyProfile } = auth.user;
+
     return (
         <AuthenticatedLayout
             header={
@@ -19,17 +24,22 @@ export default function Dashboard() {
                         <div className="p-6 text-gray-900">
                             <div className="mb-4">You're logged in!</div>
 
-                            {user.companyProfile ? (
-                                <Link href={route('company.show', user.companyProfile.id)}>
-                                    <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
-                                        View Company
-                                    </button>
+                            {/* This is the conditional logic you asked for. */}
+                            {companyProfile ? (
+                                // If companyProfile exists, show this button
+                                <Link
+                                    href={route('company.show', companyProfile)}
+                                    className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                    View Company Profile
                                 </Link>
                             ) : (
-                                <Link href={route('company.create')}>
-                                    <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
-                                        Create Company Profile
-                                    </button>
+                                // Otherwise, show this button
+                                <Link
+                                    href={route('company.create')}
+                                    className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                    Create Company Profile
                                 </Link>
                             )}
                         </div>

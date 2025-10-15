@@ -16,13 +16,14 @@ class EnsureCompanyProfileExists
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if (!$user){
+         if (!$user && !$request->is('/') && !$request->is('login') && !$request->is('register')) {
             return redirect()->route('login');
         }
-
+       
         // Allow access to '/', 'login', and 'register' endpoints without company profile
         if (
-            !$user->companyProfile &&
+            $user &&
+            !$user->companyProfile() &&
             !$request->is('/') &&
             !$request->is('login') &&
             !$request->is('register') &&
@@ -30,6 +31,9 @@ class EnsureCompanyProfileExists
         ) {
             return redirect()->route('company.create');
         }
+
+        
+
         return $next($request);
     }
 }

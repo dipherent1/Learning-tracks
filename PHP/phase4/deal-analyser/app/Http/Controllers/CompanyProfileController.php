@@ -19,7 +19,7 @@ class CompanyProfileController extends Controller
         ]);
     }
 
-    public function update(Request $request, CompanyProfile $companyProfile)
+    public function update(Request $request, CompanyProfile $company)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -30,9 +30,10 @@ class CompanyProfileController extends Controller
             'revenue' => 'nullable|numeric',
         ]);
 
-        $companyProfile->update($validated);
+        $company->update($validated);
 
-        return redirect()->route('company.show', $companyProfile->id);
+        return redirect()->route('company.show', $company);
+
     }
 
     public function show(CompanyProfile $companyProfile)
@@ -62,7 +63,7 @@ class CompanyProfileController extends Controller
             ...$validated
         ]);
 
-        return redirect()->route('company.show', $company->id);
+        return redirect()->route('company.show', $company);
 
     }
 }
