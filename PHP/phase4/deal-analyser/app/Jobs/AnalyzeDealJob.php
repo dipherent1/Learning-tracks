@@ -10,7 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage; // <-- Make sure Storage is imported
+use Illuminate\Support\Facades\Storage; 
 
 class AnalyzeDealJob implements ShouldQueue
 {
@@ -23,34 +23,50 @@ class AnalyzeDealJob implements ShouldQueue
     public function handle(): void
     {
         // Step 1: Check if there is an image to process
-        if (!$this->deal->image_path) {
-            Log::info("Job skipped: No image path for Deal ID {$this->deal->id}");
-            return; // Exit the job successfully
+        $company = $this->deal->company;
+
+         $prompt = <<<PROMPT
+        I need you to perform a comprehensive analysis of the following business deal.
+
+        **CONTEXT 1: DEAL INFORMATION FROM FORM**
+        - Title: {$this->deal->title}
+        - Description: {$this->deal->description}
+        - Estimated Value: \${$this->deal->value_estimate}
+        - Estimated Duration: {$this->deal->duration_months} months
+        
+        **CONTEXT 2: COMPANY PROFILE**
+        - Company ID: {$company->id}
+
+        **CONTEXT 3: ATTACHED IMAGE**
+        Analyze the attached image for any additional context. It might show a product, a location, a document, or people involved. Extract any relevant information.
+
+        **YOUR TASK:**
+        Based on ALL the context provided (the deal data, the company's profile, and the image), your task is to:
+        1. Identify potential financial, operational, or reputational risks.
+        2. Propose a clear mitigation strategy for each risk.
+        3. Identify any other companies or entities (third parties) mentioned or implied in the deal.
+
+        PROMPT;
+
+        $imagePayload = null;
+        if ($this->deal->image_path) {
+            $imageContents = Storage::disk('public')->get($this->deal->image_path);
+            $mimeType = Storage::disk('public')->mimeType($this->deal->image_path);
+            $base64Image = base64_encode($imageContents);
+            $imagePayload = ["data:{$mimeType};base64,{$base64Image}"];
         }
 
-        // Step 2: Read the raw binary content of the image file from storage
-        // We must use the 'public' disk since that's where the file was stored.
-        $imageContents = Storage::disk('public')->get($this->deal->image_path);
-
-        // Step 3: Get the correct MIME type (e.g., 'image/png', 'image/jpeg')
-        // This is important for the Data URI to be valid.
-        $mimeType = Storage::disk('public')->mimeType($this->deal->image_path);
-
-        // Step 4: Encode the image content into a Base64 string
-        $base64Image = base64_encode($imageContents);
-
-        // Step 5: Construct the full Data URI string
-        $imageDataUri = "data:{$mimeType};base64,{$base64Image}";
-
-        // We wrap it in an array as expected by withImages()
-        $imagePayload = [$imageDataUri];
 
         try {
-            $agent = DealAgent::for('deal-analysis-session');
+            $agent = DealAgent::for($this->deal->id);
+
+            if ($imagePayload) {
+                $agent->withImages($imagePayload);
+            }
 
             $response = $agent->withImages($imagePayload)
-                              ->respond('Analyze this image in the context of a business deal. Describe what you see, identify any key objects, brands, or concepts shown that might be relevant.');
-            
+                              ->respond($prompt);
+
             Log::info("AI Response for Deal ID {$this->deal->id}: " . $response);
 
         } catch (\Exception $e) {
