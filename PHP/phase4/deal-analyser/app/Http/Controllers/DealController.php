@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DealStored;
 use App\Models\Deal;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -46,6 +47,9 @@ class DealController extends Controller
             'description' => $validated['description'] ?? null,
             'image_path' => $imagePath,
         ]);
+        
+        DealStored::dispatch($deal);
+
 
         return redirect()->route('deals.show', $deal)->with('success', 'Deal created successfully!');
     }
