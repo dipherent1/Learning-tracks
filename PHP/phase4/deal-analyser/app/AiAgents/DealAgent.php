@@ -10,13 +10,29 @@ use LarAgent\Attributes\Tool;
 
 class DealAgent extends Agent
 {
-    protected $model = 'gemini-2.5-pro';
+    protected $model = 'gemini-2.5-flash';
 
     protected $history = 'in_memory';
 
     protected $provider = 'gemini';
 
     protected $tools = [];
+
+    // protected $responseSchema = [
+    //     'name' => 'Deal_Agent_Response',
+    //     'schema' => [
+    //         'type' => 'object',
+    //         'properties' => [
+    //             'temperature' => [
+    //                 'type' => 'number',
+    //                 'description' => 'Temperature in degrees'
+    //             ],
+    //         ],
+    //         'required' => ['temperature'],
+    //         'additionalProperties' => false,
+    //     ],
+    //     'strict' => true,
+    // ];
 
     public function instructions()
     {
@@ -29,6 +45,8 @@ class DealAgent extends Agent
     {
         return $message;
     }
+
+
 
     #[Tool('get company info',[
         'company'=> 'the company id '
