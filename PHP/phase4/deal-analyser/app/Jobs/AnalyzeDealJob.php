@@ -22,6 +22,10 @@ class AnalyzeDealJob implements ShouldQueue
 
     public function handle(): void
     {
+        Log::info('AnalyzeDealJob started', [
+            'deal_id' => $this->deal->id,
+        ]);
+
         // Step 1: Check if there is an image to process
         $company = $this->deal->company;
 
@@ -68,6 +72,10 @@ class AnalyzeDealJob implements ShouldQueue
                               ->respond($prompt);
 
             Log::info("AI Response for Deal ID {$this->deal->id}: " . $response);
+
+            Log::info('AnalyzeDealJob completed', [
+                'deal_id' => $this->deal->id,
+            ]);
 
         } catch (\Exception $e) {
             Log::error("Failed to analyze deal image for Deal ID: {$this->deal->id}", [

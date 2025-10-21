@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,6 +21,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
+        Log::info('Showing registration page');
+
         return Inertia::render('Auth/Register');
     }
 
@@ -30,6 +33,10 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        Log::info('Attempting registration', [
+            'email' => $request->input('email'),
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
@@ -45,6 +52,10 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        Log::info('User registered and logged in', [
+            'user_id' => $user->id,
+        ]);
 
         return redirect(route('dashboard', absolute: false));
     }
