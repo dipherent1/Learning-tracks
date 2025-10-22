@@ -54,8 +54,103 @@ const PartyReputation = ({ score }) => {
     );
 };
 
+const formatScore = (value) => {
+    if (value === null || value === undefined || value === '') {
+        return 'Not provided';
+    }
+
+    const numericValue = Number(value);
+
+    if (Number.isNaN(numericValue)) {
+        return 'Not provided';
+    }
+
+    if (numericValue <= 1 && numericValue >= 0) {
+        return `${Math.round(numericValue * 100)}%`;
+    }
+
+    if (numericValue <= 5) {
+        return `${numericValue} / 5`;
+    }
+
+    return `${numericValue}`;
+};
+
+const RiskMitigations = ({ mitigations }) => {
+    if (!mitigations) {
+        return <p className="text-sm text-gray-500">No mitigation strategies recorded.</p>;
+    }
+
+    const asArray = Array.isArray(mitigations)
+        ? mitigations
+        : typeof mitigations === 'object'
+            ? Object.values(mitigations)
+            : [];
+
+    if (asArray.length === 0) {
+        return <p className="text-sm text-gray-500">No mitigation strategies recorded.</p>;
+    }
+
+    return (
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-600">
+            {asArray.map((item, index) => {
+                if (item && typeof item === 'object') {
+                    const { title, action, owner, timeline, details, description } = item;
+                    const summary = [title, action, owner, timeline, details, description]
+                        .filter(Boolean)
+                        .join(' — ');
+
+                    if (summary) {
+                        return <li key={index}>{summary}</li>;
+                    }
+
+                    return <li key={index}>{JSON.stringify(item)}</li>;
+                }
+
+                if (typeof item === 'string') {
+                    return <li key={index}>{item}</li>;
+                }
+
+                return <li key={index}>{String(item)}</li>;
+            })}
+        </ul>
+    );
+};
+
+const RiskCard = ({ risk }) => (
+    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex items-start justify-between">
+            <div>
+                <h5 className="text-lg font-semibold text-gray-900">{risk.risk}</h5>
+                {risk.category && (
+                    <span className="mt-1 inline-flex items-center rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
+                        {risk.category}
+                    </span>
+                )}
+            </div>
+        </div>
+
+        <dl className="mt-4 grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2">
+            <div>
+                <dt className="font-medium text-gray-500">Likelihood</dt>
+                <dd className="text-gray-800">{formatScore(risk.likelihood)}</dd>
+            </div>
+            <div>
+                <dt className="font-medium text-gray-500">Impact</dt>
+                <dd className="text-gray-800">{formatScore(risk.impact)}</dd>
+            </div>
+        </dl>
+
+        <div className="mt-4">
+            <h6 className="text-sm font-semibold text-gray-700">Mitigation Strategies</h6>
+            <RiskMitigations mitigations={risk.mitigations} />
+        </div>
+    </div>
+);
+
 export default function Show({ deal }) {
     const parties = deal.parties ?? [];
+    const risks = deal.risks ?? [];
 
     return (
         <AuthenticatedLayout
@@ -140,6 +235,19 @@ export default function Show({ deal }) {
                                 </div>
                             ) : (
                                 <p className="mt-2 text-sm text-gray-500">No parties have been added to this deal yet.</p>
+                            )}
+                        </div>
+
+                        <div className="px-8 pb-10">
+                            <h4 className="text-lg font-semibold text-gray-800">Identified Risks</h4>
+                            {risks.length > 0 ? (
+                                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                                    {risks.map((risk) => (
+                                        <RiskCard key={risk.id ?? risk.risk} risk={risk} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="mt-2 text-sm text-gray-500">No risks have been recorded for this deal yet.</p>
                             )}
                         </div>
                     </div>

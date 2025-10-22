@@ -106,8 +106,9 @@ class AnalyzeRiskJob implements ShouldQueue
         $prompt = <<<PROMPT
         Read the entire conversation history for this session. From the conversation:
         - Identify all risks discussed.
-        - Add a new risk if it is different from those provided or if its empty.
+        - Add a new risk if it is different from those provided.
         - Avoid duplicates.
+        - Create new once if none exist.
         - For each risk include category, risk description, likelihood (0-1 or %), impact (0-1 or %), and mitigation details.
         Only use information grounded in the conversation; do not invent facts.
 
