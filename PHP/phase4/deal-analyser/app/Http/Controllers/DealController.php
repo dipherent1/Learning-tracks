@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AiAgents\ChatAgent;
 use App\Jobs\AnalyzeDealJob;
 use App\Jobs\AnalyzeRiskJob;
 use App\Models\Deal;
@@ -97,6 +98,126 @@ class DealController extends Controller
             'deal' => $deal->load(['company', 'user', 'parties', 'risks']),
         ]);
 
+    }
+
+    public function chat(Request $request, Deal $deal)
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            abort(401);
+        }
+
+        if ($deal->user_id !== $user->id && $deal->company_id !== optional($user->companyProfile)->id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $deal->loadMissing(['company', 'risks']);
+
+        Log::info('Deal chat message received', [
+            'deal_id' => $deal->id,
+            'user_id' => $user->id,
+        ]);
+
+        $agent = ChatAgent::for($user->id . '-' . $deal->id);
+
+        $prompt = $this->buildChatPrompt($deal, $validated['message']);
+        try {
+        $response = $agent->respond($prompt);
+
+        $reply = is_string($response)
+            ? $response
+            : json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        Log::info('Deal chat agent responded', [
+            'deal_id' => $deal->id,
+            'user_id' => $user->id,
+        ]);
+        
+        } catch (\Exception $e) {
+            Log::error('Deal chat agent error', [
+                'deal_id' => $deal->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $reply = "I'm sorry, but I'm currently unable to respond to your message. Please try again later.";
+        }
+
+        $deal->unsetRelation('risks');
+
+        return response()->json([
+            'reply' => $reply,
+            'risks' => $deal->risks()->get(['id', 'category', 'risk', 'likelihood', 'impact', 'mitigations']),
+        ]);
+    }
+
+    public function refreshRisks(Request $request, Deal $deal)
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            abort(401);
+        }
+
+        if ($deal->user_id !== $user->id && $deal->company_id !== optional($user->companyProfile)->id) {
+            abort(403);
+        }
+
+    AnalyzeRiskJob::dispatch($user, $deal);
+
+        Log::info('AnalyzeRiskJob dispatched from chat update button', [
+            'deal_id' => $deal->id,
+            'user_id' => $user->id,
+        ]);
+
+        return response()->json([
+            'status' => 'queued',
+            'risks' => $deal->risks()->get(['id', 'category', 'risk', 'likelihood', 'impact', 'mitigations']),
+        ]);
+    }
+
+    private function buildChatPrompt(Deal $deal, string $message): string
+    {
+        $dealContext = [
+            'title' => $deal->title,
+            'description' => $deal->description,
+            'value_estimate' => $deal->value_estimate,
+            'duration_months' => $deal->duration_months,
+            'status' => $deal->status,
+            'company' => [
+                'name' => $deal->company?->name,
+            ],
+        ];
+
+        $risks = $deal->risks->map(function ($risk) {
+            return [
+                'category' => $risk->category,
+                'risk' => $risk->risk,
+                'likelihood' => $risk->likelihood,
+                'impact' => $risk->impact,
+                'mitigations' => $risk->mitigations,
+            ];
+        })->values();
+
+        $context = json_encode([
+            'deal' => $dealContext,
+            'risks' => $risks,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return <<<PROMPT
+        You are supporting a deal review conversation. Use the provided JSON context to inform the discussion.
+        Context:
+        {$context}
+
+        The user says: {$message}
+
+        Reply conversationally with guidance or clarifying questions that stay grounded in the context.
+        PROMPT;
     }
 
     public function edit(Request $request, Deal $deal)

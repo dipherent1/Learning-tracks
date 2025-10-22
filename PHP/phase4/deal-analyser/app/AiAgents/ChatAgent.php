@@ -16,7 +16,7 @@ class ChatAgent extends Agent
 
     public function instructions()
     {
-        return "Define your agent's instructions here.";
+        return "You are an experienced deal advisor. Hold an interactive conversation with the user about a business deal and its associated risks. Keep replies concise, practical, and grounded in the supplied context. When offering guidance, reference the deal facts or risks that apply. If information is missing, ask clarifying questions instead of guessing.";
     }
 
     public function prompt($message)
