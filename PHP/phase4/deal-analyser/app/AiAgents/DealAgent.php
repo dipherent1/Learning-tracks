@@ -39,8 +39,32 @@ class DealAgent extends Agent
                     'type' => 'string',
                     'description' => 'the duration of the deal in months',
                 ],
+                'partyProfile' => [
+                    'type' => 'object',
+                    'description' => 'profile information about the deal partner',
+                    'properties' => [
+                        'name' => [
+                            'type' => 'string',
+                            'description' => 'the name of the partner company or individual',
+                        ],
+                        'type' => [
+                            'type' => 'string',
+                            'description' => 'the type of partner (e.g., vendor, client, investor, partner)',
+                        ],
+                        'reputationScore' => [
+                            'type' => 'number',
+                            'description' => 'a numerical score representing the reputation of the partner',
+                        ],
+                        'summary' => [
+                            'type' => 'string',
+                            'description' => 'a brief summary of the partner\'s background and history',
+                        ],
+                    ],
+                    'required' => ['name', 'type'],
+                    'additionalProperties' => false,
+                ],
             ],
-            'required' => ['title', 'description', 'valueEstimate', 'duration'],
+            'required' => ['title', 'description', 'valueEstimate', 'duration', 'partyProfile'],
             'additionalProperties' => false,
         ],
         'strict' => true,
@@ -48,7 +72,7 @@ class DealAgent extends Agent
 
     public function instructions()
     {
-        return "You are a Deal Analysis Agent. Your task is to analyze business deals based on provided information and generate structured responses. Use the provided data to extract key details about the deal, including title, description, value estimate, and duration. Ensure that your responses adhere strictly to the defined response schema. Avoid adding any extra information or deviating from the specified format.";
+        return "You are a Deal Analysis Agent. Your task is to analyze business deals based on provided information and generate structured responses. Use the provided data to extract key details about the deal, including title, description, value estimate, and duration. Ensure that your responses adhere strictly to the defined response schema. Avoid adding any extra information or deviating from the specified format. If you need additional information about a company involved in the deal, use the available tools to fetch the necessary data. Always aim to provide clear, concise, and accurate information that can assist in understanding the deal's specifics.";
     }
 
     public function prompt($message)

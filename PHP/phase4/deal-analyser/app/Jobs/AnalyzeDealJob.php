@@ -53,18 +53,54 @@ class AnalyzeDealJob implements ShouldQueue
             $payload = $this->decodeResponse($response);
 
             if ($payload) {
+                Log::info('AI response decoded successfully', [
+                    'deal_id' => $this->deal->id,
+                    'payload' => $payload,
+                ]);
                 $updates = $this->mapAgentResponse($payload);
+                if (empty($updates) || count($updates) === 0) {
+                    Log::warning('AI response contained no mappable fields', [
+                        'deal_id' => $this->deal->id,
+                    ]);
+                    return;
+                }
+                Log::info('Mapped AI response to deal fields', [
+                    'deal_id' => $this->deal->id,
+                    'mapped_fields' => $updates,
+                ]);
 
-                if (! empty($updates)) {
-                    $this->deal->fill($updates);
+                $dealUpdate = $updates[0];
+                $partyProfile = $updates[1];
+                if (! empty($dealUpdate)) {
+                    $this->deal->fill($dealUpdate);
                     $this->deal->save();
 
                     Log::info('Deal updated from AI analysis', [
                         'deal_id' => $this->deal->id,
-                        'updated_fields' => array_keys($updates),
+                        'updated_fields' => array_keys($dealUpdate),
                     ]);
                 } else {
                     Log::warning('AI response contained no mappable fields', [
+                        'deal_id' => $this->deal->id,
+                    ]);
+                }
+
+                if (! empty($partyProfile)) {
+                    $this->deal->parties()->updateOrCreate(
+                        ['deal_id' => $this->deal->id, 'name' => $partyProfile['name']],
+                        [
+                            'type' => $partyProfile['type'] ?? null,
+                            'reputation_score' => $partyProfile['reputationScore'] ?? null,
+                            'summary' => $partyProfile['summary'] ?? null,
+                        ]
+                    );
+
+                    Log::info('Deal partner profile updated from AI analysis', [
+                        'deal_id' => $this->deal->id,
+                        'partner_name' => $partyProfile['name'],
+                    ]);
+                }else {
+                    Log::info('No partner profile data found in AI response', [
                         'deal_id' => $this->deal->id,
                     ]);
                 }
@@ -132,8 +168,12 @@ class AnalyzeDealJob implements ShouldQueue
                 $updates['duration_months'] = $duration;
             }
         }
+        if (! empty($payload['partyProfile'])) {
+            $partner = $payload['partyProfile'];
 
-        return $updates;
+        }
+
+        return [$updates, $partner ?? null];
     }
 
     private function parseDecimal(mixed $value): ?float

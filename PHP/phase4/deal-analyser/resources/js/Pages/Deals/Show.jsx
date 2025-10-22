@@ -17,7 +17,46 @@ const StatusBadge = ({ status, className = '' }) => {
     );
 };
 
+const PartyTypeBadge = ({ type }) => {
+    if (!type) {
+        return null;
+    }
+
+    const labels = {
+        vendor: 'Vendor',
+        client: 'Client',
+        partner: 'Partner',
+        investor: 'Investor',
+    };
+
+    return (
+        <span className="ml-2 inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+            {labels[type] ?? type}
+        </span>
+    );
+};
+
+const PartyReputation = ({ score }) => {
+    if (score === null || score === undefined || score === '') {
+        return <span className="text-sm text-gray-500">No reputation data</span>;
+    }
+
+    const numericScore = Number(score);
+
+    if (Number.isNaN(numericScore)) {
+        return <span className="text-sm text-gray-500">No reputation data</span>;
+    }
+
+    return (
+        <span className="text-sm font-semibold text-emerald-600">
+            Reputation Score: {numericScore.toFixed(1)}
+        </span>
+    );
+};
+
 export default function Show({ deal }) {
+    const parties = deal.parties ?? [];
+
     return (
         <AuthenticatedLayout
             header={
@@ -76,8 +115,29 @@ export default function Show({ deal }) {
                         {/* You can add sections for Parties and Risks here later */}
                         <div className="px-8 pb-8">
                             <h4 className="text-lg font-semibold text-gray-800">Associated Parties</h4>
-                            {deal.parties.length > 0 ? (
-                                <p className="mt-2 text-gray-600">Map over deal.parties here.</p>
+                            {parties.length > 0 ? (
+                                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                                    {parties.map((party) => (
+                                        <div key={party.id} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <h5 className="text-lg font-semibold text-gray-900">
+                                                        {party.name}
+                                                    </h5>
+                                                </div>
+                                                <PartyTypeBadge type={party.type} />
+                                            </div>
+
+                                            <div className="mt-2">
+                                                <PartyReputation score={party.reputation_score} />
+                                            </div>
+
+                                            <p className="mt-3 text-sm text-gray-600 whitespace-pre-line">
+                                                {party.summary || 'No summary available for this party.'}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
                                 <p className="mt-2 text-sm text-gray-500">No parties have been added to this deal yet.</p>
                             )}

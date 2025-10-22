@@ -10,4 +10,11 @@ class PartyProfile extends Model
 {
     /** @use HasFactory<\Database\Factories\PartyProfileFactory> */
     use HasFactory, HasUuids;
+    protected $fillable = [
+        'deal_id',
+        'name',
+        'type',
+        'reputation_score',
+        'summary',
+    ];
 }
