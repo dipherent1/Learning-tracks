@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\AnalyzeDealJob;
+use App\Jobs\AnalyzeRiskJob;
 use App\Models\Deal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -68,8 +70,11 @@ class DealController extends Controller
             'company_id' => $user->companyProfile->id,
             'image_path' => $imagePath,
         ]);
-        
-        AnalyzeDealJob::dispatch($user, $deal)->onQueue('high');
+
+        Bus::chain([
+            new AnalyzeDealJob($user, $deal),
+            new AnalyzeRiskJob($user, $deal),
+        ])->dispatch();
 
         Log::info('AnalyzeDealJob dispatched', [
             'user_id' => $user->id,
