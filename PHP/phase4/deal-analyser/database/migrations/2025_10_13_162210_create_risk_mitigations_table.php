@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('risk');
             $table->decimal('likelihood', 3, 2)->nullable(); // 0–1
             $table->decimal('impact', 3, 2)->nullable();     // 0–1
-            $table->text('mitigation')->nullable();
+            $table->jsonb('mitigations')->nullable();
             $table->timestamps();
         });
     }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\DealStored;
+use App\Jobs\AnalyzeDealJob;
 use App\Models\Deal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -47,52 +47,34 @@ class DealController extends Controller
     {
         Log::info('Creating deal', [
             'user_id' => $request->user()?->id,
-            'input' => $request->except(['_token']),
             'has_image' => $request->hasFile('image'),
         ]);
 
-        $validated = $request->validate([
-            'value_estimate' => 'nullable|numeric',
-            'duration_months' => 'nullable|integer',
-            'description' => 'nullable|required|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Log::info('Deal data validated', [
+        $imagePath = $request->file('image')->store('deals', 'public');
+
+        Log::info('Deal image stored', [
             'user_id' => $request->user()?->id,
-            'validated' => $validated,
+            'image_path' => $imagePath,
         ]);
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('deals', 'public');
-            Log::info('Deal image stored', [
-                'user_id' => $request->user()?->id,
-                'image_path' => $imagePath,
-            ]);
-        }
+
         $user = $request->user();
-        $company = $user->companyProfile;
-        $deal = Deal::create([
+        $deal = $user->companyProfile->deals()->create([
             'user_id' => $user->id,
-            'company_id' => $company->id,
-            'value_estimate' => $validated['value_estimate'] ?? null,
-            'duration_months' => $validated['duration_months'] ?? null,
-            'title' => $request->title ?? null,
-            'description' => $validated['description'] ?? null,
+            'company_id' => $user->companyProfile->id,
             'image_path' => $imagePath,
         ]);
         
-        Log::info('Deal created', [
+        AnalyzeDealJob::dispatch($user, $deal)->onQueue('high');
+
+        Log::info('AnalyzeDealJob dispatched', [
             'user_id' => $user->id,
-            'company_id' => $company->id,
             'deal_id' => $deal->id,
-        ]);
-
-        DealStored::dispatch($deal);
-
-        Log::info('DealStored event dispatched', [
-            'deal_id' => $deal->id,
+            'image_path'=> $imagePath,
         ]);
 
         return redirect()->route('deals.show', $deal)->with('success', 'Deal created successfully!');

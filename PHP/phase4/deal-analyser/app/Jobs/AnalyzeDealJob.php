@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\AiAgents\DealAgent;
 use App\Models\Deal;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -16,7 +17,7 @@ class AnalyzeDealJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(protected Deal $deal)
+    public function __construct(protected User $user, protected Deal $deal)
     {
     }
 
@@ -26,32 +27,8 @@ class AnalyzeDealJob implements ShouldQueue
             'deal_id' => $this->deal->id,
         ]);
 
-        // Step 1: Check if there is an image to process
-        $company = $this->deal->company;
-
-         $prompt = <<<PROMPT
-        I need you to perform a comprehensive analysis of the following business deal.
-
-        **CONTEXT 1: DEAL INFORMATION FROM FORM**
-        - Title: {$this->deal->title}
-        - Description: {$this->deal->description}
-        - Estimated Value: \${$this->deal->value_estimate}
-        - Estimated Duration: {$this->deal->duration_months} months
-        
-        **CONTEXT 2: COMPANY PROFILE**
-        - Company ID: {$company->id}
-
-        **CONTEXT 3: ATTACHED IMAGE**
-        Analyze the attached image for any additional context. It might show a product, a location, a document, or people involved. Extract any relevant information.
-
-        **YOUR TASK:**
-        Based on ALL the context provided (the deal data, the company's profile, and the image), your task is to:
-        1. Identify potential financial, operational, or reputational risks.
-        2. Propose a clear mitigation strategy for each risk.
-        3. Identify any other companies or entities (third parties) mentioned or implied in the deal.
-
-        PROMPT;
-
+        $prompt = "Analyze the following business deal image.";
+    
         $imagePayload = null;
         if ($this->deal->image_path) {
             $imageContents = Storage::disk('public')->get($this->deal->image_path);
@@ -62,16 +39,40 @@ class AnalyzeDealJob implements ShouldQueue
 
 
         try {
-            $agent = DealAgent::for($this->deal->id);
-
-            if ($imagePayload) {
-                $agent->withImages($imagePayload);
-            }
-
+            Log::info("Preparing to analyze deal image for Deal ID: {$this->deal->id} for user ID: {$this->user->id}");
+            $agent = DealAgent::for($this->user->id . '-' . $this->deal->id);
+            
             $response = $agent->withImages($imagePayload)
                               ->respond($prompt);
 
-            Log::info("AI Response for Deal ID {$this->deal->id}: " . $response);
+            Log::info('AI response received', [
+                'deal_id' => $this->deal->id,
+                'response' => $response,
+            ]);
+
+            $payload = $this->decodeResponse($response);
+
+            if ($payload) {
+                $updates = $this->mapAgentResponse($payload);
+
+                if (! empty($updates)) {
+                    $this->deal->fill($updates);
+                    $this->deal->save();
+
+                    Log::info('Deal updated from AI analysis', [
+                        'deal_id' => $this->deal->id,
+                        'updated_fields' => array_keys($updates),
+                    ]);
+                } else {
+                    Log::warning('AI response contained no mappable fields', [
+                        'deal_id' => $this->deal->id,
+                    ]);
+                }
+            } else {
+                Log::warning('Unable to decode AI response', [
+                    'deal_id' => $this->deal->id,
+                ]);
+            }
 
             Log::info('AnalyzeDealJob completed', [
                 'deal_id' => $this->deal->id,
@@ -84,5 +85,100 @@ class AnalyzeDealJob implements ShouldQueue
             ]);
             throw $e;
         }
+
+    }
+
+    private function decodeResponse(mixed $response): ?array
+    {
+        if (is_array($response)) {
+            return $response;
+        }
+
+        if (is_string($response)) {
+            $decoded = json_decode($response, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return null;
+    }
+
+    private function mapAgentResponse(array $payload): array
+    {
+        $updates = [];
+
+        if (! empty($payload['title'])) {
+            $updates['title'] = $payload['title'];
+        }
+
+        if (! empty($payload['description'])) {
+            $updates['description'] = $payload['description'];
+        }
+
+        if (! empty($payload['valueEstimate'])) {
+            $value = $this->parseDecimal($payload['valueEstimate']);
+
+            if ($value !== null) {
+                $updates['value_estimate'] = $value;
+            }
+        }
+
+        if (! empty($payload['duration'])) {
+            $duration = $this->parseInteger($payload['duration']);
+
+            if ($duration !== null) {
+                $updates['duration_months'] = $duration;
+            }
+        }
+
+        return $updates;
+    }
+
+    private function parseDecimal(mixed $value): ?float
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        if (is_string($value)) {
+            $filtered = preg_replace('/[^0-9.\-]/', '', $value);
+
+            if ($filtered !== '' && is_numeric($filtered)) {
+                return (float) $filtered;
+            }
+        }
+
+        return null;
+    }
+
+    private function parseInteger(mixed $value): ?int
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        if (is_string($value)) {
+            $filtered = preg_replace('/[^0-9\-]/', '', $value);
+
+            if ($filtered !== '' && is_numeric($filtered)) {
+                return (int) $filtered;
+            }
+        }
+
+        return null;
     }
 }
