@@ -1,0 +1,49 @@
+<script setup>
+import AppLayout from '@/Layouts/AppLayout.vue';
+import { defineProps } from 'vue';
+import { Link } from '@inertiajs/vue3'; // <-- Add this import
+
+
+// The controller is passing a 'tickets' prop, so we need to define it
+const props = defineProps({
+    tickets: Object,
+});
+</script>
+
+<template>
+    <AppLayout title="All Tickets">
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Support Tickets
+            </h2>
+            <Link :href="route('tickets.create')" class="px-4 py-2 bg-gray-800 text-white rounded-md">
+                Create Ticket
+            </Link>
+
+        </template>
+        
+
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
+                        <table class="w-full text-left">
+                           <!-- ... thead ... -->
+                            <tbody>
+                                <!-- MODIFIED LINE: Added the <Link> component -->
+                                <Link as="tr" v-for="ticket in tickets.data" :key="ticket.id" :href="route('tickets.show', ticket.id)" class="border-b hover:bg-gray-100 cursor-pointer">
+                                    <td class="p-4">{{ ticket.id }}</td>
+                                    <td class="p-4">{{ ticket.title }}</td>
+                                    <td class="p-4">{{ ticket.user.name }}</td>
+                                    <td class="p-4">{{ ticket.department.name }}</td>
+                                    <td class="p-4">{{ ticket.status }}</td>
+                                    <td class="p-4">{{ new Date(ticket.created_at).toLocaleString() }}</td>
+                                </Link>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
