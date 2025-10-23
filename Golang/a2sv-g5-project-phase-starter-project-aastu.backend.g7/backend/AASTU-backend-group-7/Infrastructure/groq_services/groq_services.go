@@ -41,9 +41,6 @@ type Choice struct {
 	Message ChatMessage `json:"message"`
 }
 
-// GroqAI service struct
-var APIKey = "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"
-
 type GroqAI struct {
 	APIKey string
 	test   string
