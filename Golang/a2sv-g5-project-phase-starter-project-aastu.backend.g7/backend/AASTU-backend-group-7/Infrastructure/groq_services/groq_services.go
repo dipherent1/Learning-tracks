@@ -46,6 +46,8 @@ type GroqAI struct {
 	test   string
 }
 
+var APIKey = Config.GROQ_API_KEY
+
 func NewGroqAI(apiKey string) *GroqAI {
 	Config.Envinit()
 	return &GroqAI{APIKey: apiKey,
